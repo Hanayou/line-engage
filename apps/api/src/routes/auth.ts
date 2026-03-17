@@ -2,7 +2,8 @@ import { Hono } from "hono";
 import { db } from "../db/client";
 import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
-import { compareSync } from "bcryptjs";
+import bcryptjs from "bcryptjs";
+const { compareSync } = bcryptjs;
 
 export const authRoutes = new Hono();
 

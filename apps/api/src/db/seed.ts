@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { hashSync } from "bcryptjs";
+import bcryptjs from "bcryptjs";
+const { hashSync } = bcryptjs;
 import { v4 as uuid } from "uuid";
 import { users, customers, activityLogs, dashboardStats } from "./schema";
 
@@ -82,7 +83,7 @@ function randomDate(daysBack: number): Date {
   const now = new Date();
   const past = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
   return new Date(
-    past.getTime() + Math.random() * (now.getTime() - past.getTime())
+    past.getTime() + Math.random() * (now.getTime() - past.getTime()),
   );
 }
 
@@ -152,9 +153,7 @@ async function seed() {
     });
   }
   // Sort by date descending
-  activities.sort(
-    (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-  );
+  activities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   await db.insert(activityLogs).values(activities);
   console.log(`  ✓ ${activities.length} activity logs created`);
 
@@ -168,7 +167,8 @@ async function seed() {
     friendsBase += Math.floor(Math.random() * 15) + 2;
     const openRate = 58 + Math.random() * 18;
     const vocCount = Math.floor(Math.random() * 12) + 3;
-    const campaignsSent = Math.random() > 0.6 ? Math.floor(Math.random() * 3) + 1 : 0;
+    const campaignsSent =
+      Math.random() > 0.6 ? Math.floor(Math.random() * 3) + 1 : 0;
 
     await db.insert(dashboardStats).values({
       id: uuid(),
