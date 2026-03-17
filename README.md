@@ -1,6 +1,6 @@
 # LINE Engage — Customer Engagement SaaS Demo
 
-A full-stack demo of a LINE Mini App customer engagement platform, built with the modern TypeScript stack.
+A full-stack demo of a LINE Mini App customer engagement platform.
 
 ## Architecture
 
@@ -23,21 +23,22 @@ A full-stack demo of a LINE Mini App customer engagement platform, built with th
 
 ### Tech Stack
 
-| Layer          | Technology                              |
-|----------------|-----------------------------------------|
-| Frontend       | Next.js 14 (App Router), Tailwind CSS   |
-| Backend        | Hono (standalone Node.js server)        |
-| Auth           | NextAuth.js (Credentials provider)      |
-| Database       | PostgreSQL 16, Drizzle ORM              |
-| LINE SDK       | LIFF v2 + @line/liff-mock               |
-| Infrastructure | Google Cloud (Cloud Run, Cloud SQL)      |
-| IaC            | Terraform                               |
-| CI/CD          | GitHub Actions                          |
-| Monorepo       | Turborepo + pnpm workspaces             |
+| Layer          | Technology                            |
+| -------------- | ------------------------------------- |
+| Frontend       | Next.js 14 (App Router), Tailwind CSS |
+| Backend        | Hono (standalone Node.js server)      |
+| Auth           | NextAuth.js (Credentials provider)    |
+| Database       | PostgreSQL 16, Drizzle ORM            |
+| LINE SDK       | LIFF v2 + @line/liff-mock             |
+| Infrastructure | Google Cloud (Cloud Run, Cloud SQL)   |
+| IaC            | Terraform                             |
+| CI/CD          | GitHub Actions                        |
+| Monorepo       | Turborepo + pnpm workspaces           |
 
 ## Quick Start (Local)
 
 ### Prerequisites
+
 - Node.js 20+
 - pnpm 9+
 - Docker (for PostgreSQL)
@@ -81,6 +82,7 @@ pnpm dev
 - **Health**: http://localhost:8787/health
 
 ### Demo credentials
+
 - Email: `admin@line-engage.dev`
 - Password: `demo1234`
 
@@ -112,16 +114,21 @@ line-engage-demo/
 ## Key Design Decisions
 
 ### Why separate Hono API vs Next.js API routes?
+
 The API serves both the dashboard AND the LINE Mini App (LIFF). Independent deployment allows the API to scale separately from the frontend — critical for a SaaS serving potentially thousands of LINE Mini App users while the dashboard has a handful of brand managers.
 
 ### Why Drizzle ORM?
+
 Type-safe schema definitions that generate TypeScript types, lightweight runtime (no query builder overhead), and first-class migration support. Fits the "modern TypeScript" philosophy of the stack.
 
 ### Why Cloud Run?
+
 Zero-to-scale serverless is ideal for SaaS: no cost when idle, automatic scaling under load, no infrastructure management. Combined with Cloud SQL for managed PostgreSQL and VPC connectors for secure private networking.
 
 ### LIFF Integration Pattern
+
 The demo uses `@line/liff-mock` for browser-based testing. The real integration follows the same pattern:
+
 1. `liff.init({ liffId })` — authenticates with LINE
 2. `liff.getProfile()` — retrieves user info
 3. Send user ID to our API → link with customer record
@@ -129,15 +136,15 @@ The demo uses `@line/liff-mock` for browser-based testing. The real integration 
 
 ## API Endpoints
 
-| Method | Path                     | Description                     |
-|--------|--------------------------|---------------------------------|
-| GET    | `/health`                | Service health check            |
-| POST   | `/api/v1/auth/verify`    | Verify login credentials        |
-| GET    | `/api/v1/dashboard/stats`| Aggregate engagement metrics    |
-| GET    | `/api/v1/dashboard/trend`| 7-day engagement trend          |
-| GET    | `/api/v1/customers`      | Paginated customer list         |
-| GET    | `/api/v1/customers/:id`  | Single customer detail          |
-| GET    | `/api/v1/activity`       | Recent activity feed            |
+| Method | Path                      | Description                  |
+| ------ | ------------------------- | ---------------------------- |
+| GET    | `/health`                 | Service health check         |
+| POST   | `/api/v1/auth/verify`     | Verify login credentials     |
+| GET    | `/api/v1/dashboard/stats` | Aggregate engagement metrics |
+| GET    | `/api/v1/dashboard/trend` | 7-day engagement trend       |
+| GET    | `/api/v1/customers`       | Paginated customer list      |
+| GET    | `/api/v1/customers/:id`   | Single customer detail       |
+| GET    | `/api/v1/activity`        | Recent activity feed         |
 
 ## Infrastructure (Terraform)
 
@@ -149,6 +156,7 @@ terraform apply -var-file=prod.tfvars
 ```
 
 Resources provisioned:
+
 - Cloud Run services (web + api) with auto-scaling
 - Cloud SQL PostgreSQL 16 with automated backups
 - VPC + connector for private Cloud SQL access
