@@ -1,0 +1,7 @@
+#!/bin/sh
+echo "Pre-commit: running typecheck..."
+pnpm typecheck
+if [ $? -ne 0 ]; then
+  echo "Typecheck failed. Commit aborted."
+  exit 1
+fi

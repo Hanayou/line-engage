@@ -13,17 +13,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-// Register mock plugin once at module level
-liff.use(new LiffMockPlugin());
-
-// Override mock defaults with realistic Japanese profile data
-(liff as any).$mock.set({
-  getProfile: {
-    displayName: "田中太郎",
-    userId: "U1234567890abcdef1234567890abcdef",
-    statusMessage: "LINE Engage テスト中",
-  },
-});
+let liffPluginRegistered = false;
 
 type Profile = {
   displayName: string;
@@ -44,6 +34,17 @@ export default function LinePage() {
     setInitializing(true);
     setError(null);
     try {
+      if (!liffPluginRegistered) {
+        liff.use(new LiffMockPlugin());
+        (liff as any).$mock.set({
+          getProfile: {
+            displayName: "田中太郎",
+            userId: "U1234567890abcdef1234567890abcdef",
+            statusMessage: "LINE Engage テスト中",
+          },
+        });
+        liffPluginRegistered = true;
+      }
       await liff.init({ liffId: "1234567890-abcdefgh", mock: true } as any);
       if (!liff.isLoggedIn()) {
         liff.login();
