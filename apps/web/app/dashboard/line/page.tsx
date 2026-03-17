@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import liff from "@line/liff";
+import { LiffMockPlugin } from "@line/liff-mock";
 import {
   MessageCircle,
   User,
@@ -8,61 +10,88 @@ import {
   CheckCircle2,
   ExternalLink,
   Code2,
+  AlertCircle,
 } from "lucide-react";
 
-// Mock LIFF profile data (matches @line/liff-mock defaults)
-const MOCK_PROFILE = {
-  displayName: "田中太郎",
-  userId: "U1234567890abcdef1234567890abcdef",
-  pictureUrl: null,
-  statusMessage: "LINE Engage テスト中 🚀",
+// Register mock plugin once at module level
+liff.use(new LiffMockPlugin());
+
+// Override mock defaults with realistic Japanese profile data
+(liff as any).$mock.set({
+  getProfile: {
+    displayName: "田中太郎",
+    userId: "U1234567890abcdef1234567890abcdef",
+    statusMessage: "LINE Engage テスト中",
+  },
+});
+
+type Profile = {
+  displayName: string;
+  userId: string;
+  statusMessage?: string;
+  pictureUrl?: string;
 };
 
 export default function LinePage() {
   const [liffInitialized, setLiffInitialized] = useState(false);
-  const [profile, setProfile] = useState<typeof MOCK_PROFILE | null>(null);
+  const [initializing, setInitializing] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [messageSent, setMessageSent] = useState(false);
   const [showCode, setShowCode] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleInitLiff() {
-    // Simulates liff.init() + liff.getProfile()
-    // In production, this would use the real LIFF SDK:
-    // await liff.init({ liffId: 'YOUR_LIFF_ID' });
-    // const profile = await liff.getProfile();
-    setTimeout(() => {
+  async function handleInitLiff() {
+    setInitializing(true);
+    setError(null);
+    try {
+      await liff.init({ liffId: "1234567890-abcdefgh", mock: true } as any);
+      if (!liff.isLoggedIn()) {
+        liff.login();
+      }
+      const userProfile = await liff.getProfile();
+      setProfile(userProfile as Profile);
       setLiffInitialized(true);
-      setProfile(MOCK_PROFILE);
-    }, 600);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to initialize LIFF");
+    } finally {
+      setInitializing(false);
+    }
   }
 
-  function handleSendMessage() {
-    // Simulates liff.sendMessages()
-    setMessageSent(true);
-    setTimeout(() => setMessageSent(false), 3000);
+  async function handleSendMessage() {
+    try {
+      await liff.sendMessages([
+        { type: "text", text: "Hello from LINE Engage!" },
+      ]);
+      setMessageSent(true);
+      setTimeout(() => setMessageSent(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send message");
+    }
   }
 
   const initCode = `import liff from '@line/liff';
 import { LiffMockPlugin } from '@line/liff-mock';
 
-// Use mock in development
-if (process.env.NODE_ENV === 'development') {
-  liff.use(new LiffMockPlugin());
-}
+// Register mock plugin — in production, skip this
+// and use a real LIFF ID from LINE Developers Console
+liff.use(new LiffMockPlugin());
 
 await liff.init({
   liffId: process.env.NEXT_PUBLIC_LIFF_ID!,
-  mock: process.env.NODE_ENV === 'development',
+  mock: true, // set false for production
 });
 
-// Get user profile
+// Get user profile — returns real LINE profile in production,
+// mock data (displayName: "Brown") in mock mode
 const profile = await liff.getProfile();
-console.log(profile.displayName); // "田中太郎"
-console.log(profile.userId);      // "U1234..."
+console.log(profile.displayName);
+console.log(profile.userId);
 
-// Send message to chat
+// Send message to user's LINE chat
 await liff.sendMessages([{
   type: 'text',
-  text: 'Hello from LINE Engage! 🎉',
+  text: 'Hello from LINE Engage!',
 }]);`;
 
   return (
@@ -97,10 +126,17 @@ await liff.sendMessages([{
               </p>
               <button
                 onClick={handleInitLiff}
-                className="rounded-lg bg-line-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-line-green-hover transition-colors"
+                disabled={initializing}
+                className="rounded-lg bg-line-green px-5 py-2.5 text-sm font-semibold text-white hover:bg-line-green-hover disabled:opacity-50 transition-colors"
               >
-                Initialize LIFF
+                {initializing ? "Initializing..." : "Initialize LIFF"}
               </button>
+              {error && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-red-600">
+                  <AlertCircle size={14} />
+                  {error}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
