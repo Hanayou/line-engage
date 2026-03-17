@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ── Fonts ─────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap");
+
+/* ── Theme (replaces tailwind.config.ts in v4) ─────── */
+@theme {
+  --color-line-green: #06C755;
+  --color-line-green-hover: #05b34d;
+  --color-line-dark: #1a1a1a;
+
+  --font-sans: "Noto Sans JP", "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* ── CSS custom property for layout ────────────────── */
+:root {
+  --sidebar-width: 260px;
+}
+
+/* ── Base styles ───────────────────────────────────── */
+body {
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+/* ── Component utilities (v4 @utility syntax) ──────── */
+@utility stat-card {
+  @apply rounded-xl bg-white p-5 shadow-sm border border-gray-100 transition-shadow hover:shadow-md;
+}
+
+@utility sidebar-link {
+  @apply flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900;
+}
+
+@utility badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+@utility badge-vip {
+  @apply bg-amber-100 text-amber-800;
+}
+
+@utility badge-regular {
+  @apply bg-blue-100 text-blue-800;
+}
+
+@utility badge-new {
+  @apply bg-emerald-100 text-emerald-800;
+}
