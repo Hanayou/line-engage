@@ -48,6 +48,9 @@ importers:
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
       '@types/uuid':
         specifier: ^10.0.0
         version: 10.0.0
