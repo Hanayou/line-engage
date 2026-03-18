@@ -10,13 +10,14 @@ import { authRoutes } from "./routes/auth";
 import { dashboardRoutes } from "./routes/dashboard";
 import { customerRoutes } from "./routes/customers";
 import { activityRoutes } from "./routes/activity";
+import { feedbackRoutes } from "./routes/feedback";
 import { logger } from "./lib/logger";
 
 const app = new Hono();
 
 // ── Global middleware ─────────────────────────────────
 app.use("*", cors({
-  origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+  origin: (process.env.CORS_ORIGIN || "http://localhost:3000,http://localhost:3001").split(","),
   credentials: true,
 }));
 app.use("*", requestId);
@@ -40,6 +41,7 @@ api.route("/auth", authRoutes);
 api.route("/dashboard", dashboardRoutes);
 api.route("/customers", customerRoutes);
 api.route("/activity", activityRoutes);
+api.route("/feedback", feedbackRoutes);
 
 app.route("/api/v1", api);
 
