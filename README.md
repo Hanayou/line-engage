@@ -8,24 +8,24 @@ A full-stack demo of a LINE Mini App customer engagement platform.
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │   Next.js    │────▶│    Hono      │────▶│  PostgreSQL   │
 │   Dashboard  │     │    API       │     │  (Cloud SQL)  │
-│   + NextAuth │     │  /api/v1/*   │     │               │
 │   Port 3000  │     │  Port 8787   │     │  Port 5432    │
-└──────┬───────┘     └──────────────┘     └───────────────┘
-       │
-       │  LIFF SDK
-       ▼
-┌──────────────┐
-│  LINE App    │
-│  (Mini App)  │
-│  End Users   │
+└──────────────┘     └──────┬───────┘     └───────────────┘
+                            │
+┌──────────────┐            │
+│  LIFF App    │────────────┘
+│  Mini App    │
+│  Port 3001   │
 └──────────────┘
 ```
+
+The **Dashboard** (Next.js) is for brand managers. The **LIFF Mini App** (Vite + React) is the consumer-facing app that end users open inside the LINE app. Both share the same Hono API.
 
 ### Tech Stack
 
 | Layer          | Technology                            |
 | -------------- | ------------------------------------- |
-| Frontend       | Next.js 14 (App Router), Tailwind CSS |
+| Dashboard      | Next.js 14 (App Router), Tailwind CSS |
+| LIFF Mini App  | Vite + React, Tailwind CSS            |
 | Backend        | Hono (standalone Node.js server)      |
 | Auth           | NextAuth.js (Credentials provider)    |
 | Database       | PostgreSQL 16, Drizzle ORM            |
@@ -77,9 +77,12 @@ pnpm db:seed
 pnpm dev
 ```
 
-- **Web**: http://localhost:3000
+- **Web (Dashboard)**: http://localhost:3000
+- **LIFF (Mini App)**: http://localhost:3001
 - **API**: http://localhost:8787
 - **Health**: http://localhost:8787/health
+
+> The LIFF app runs on port 3001 and can be opened directly in a browser (mock mode) or inside LINE via the LIFF URL.
 
 ### Demo credentials
 
@@ -96,6 +99,9 @@ line-engage-demo/
 │   │   ├── components/   # React components
 │   │   ├── lib/          # Auth config, API client
 │   │   └── Dockerfile
+│   ├── liff/             # Consumer-facing LIFF Mini App (Vite + React)
+│   │   ├── src/          # React components, LIFF SDK integration
+│   │   └── index.html
 │   └── api/              # Hono REST API
 │       ├── src/
 │       │   ├── routes/   # Route handlers
@@ -145,6 +151,7 @@ The demo uses `@line/liff-mock` for browser-based testing. The real integration 
 | GET    | `/api/v1/customers`       | Paginated customer list      |
 | GET    | `/api/v1/customers/:id`   | Single customer detail       |
 | GET    | `/api/v1/activity`        | Recent activity feed         |
+| POST   | `/api/v1/feedback`        | Submit consumer feedback      |
 
 ## Infrastructure (Terraform)
 
