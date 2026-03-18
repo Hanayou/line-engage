@@ -7,11 +7,19 @@ const USE_MOCK = import.meta.env.VITE_LIFF_MOCK === "true";
 export async function initializeLiff() {
   if (USE_MOCK) {
     liff.use(new LiffMockPlugin());
+    (liff as any).$mock.set({
+      getProfile: {
+        displayName: "Samuel Short",
+        userId: "U1234567890abcdef1234567890abcdef",
+        statusMessage: "LINE Engage テスト中",
+        pictureUrl: "https://avatars.githubusercontent.com/u/33036922?v=4",
+      },
+    });
   }
 
   await liff.init({ liffId: LIFF_ID, mock: USE_MOCK } as Parameters<typeof liff.init>[0]);
 
-  if (!liff.isLoggedIn() && !USE_MOCK) {
+  if (!liff.isLoggedIn()) {
     liff.login();
   }
 
